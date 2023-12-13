@@ -31,6 +31,7 @@ import cv2
 import numpy as np
 import pyrealsense2 as rs
 
+
 class AppState:
 
     def __init__(self, *args, **kwargs):

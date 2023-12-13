@@ -17,3 +17,10 @@ https://github.com/IntelRealSense/librealsense/wiki
 ### let's get sample file from here
 
 https://github.com/IntelRealSense/librealsense/tree/master/wrappers/python/examples
+
+### list of package which is need to pre-load
+
+- pip install opencv-python
+  - it will be cv2
+- pip install pyrealsense2
+- pip install numpy
