@@ -3,39 +3,49 @@ import time
 from function_tool import MathTool as math
 import cv2 as cv
 
-FILE_PATH = "opencv_practice\captured\captured_20240707202125.771463_1.jpg"
+FILE_PATH = "opencv_practice\captured\Snipaste_2024-07-05_14-24-43.png"
 MAX_VALUE = 255
 
-img_import = cv.imread(FILE_PATH, cv.IMREAD_COLOR)  # BGR이다, 까먹지 말자.
 
-print(np.shape(img_import))
-try:
-    if (np.shape(img_import == None)):
-        raise NameError
-except:
-    # print("파일이 없습니다.")
-    pass
+class PreProcess():
+    def __init__(self, filePath, maxValue) -> None:
+        self._FILE_PATH = filePath
+        # RGB 아니다, BGR이다. 까먹지 말자.
+        self.img_import = cv.imread(self._FILE_PATH, cv.IMREAD_COLOR)
+        # 예외처리항
+        try:
+            if (np.shape(self.img_import == None)):
+                raise NameError  # 귀찮아서 NameError로 함. 새로 에러클래스 선언하는것이 정배이긴함.
+        except:
+            print(np.shape(self.img_import))  # debug
+            # print("파일이 없습니다.") # debug
+            pass
+        self._MAX_VALUE = maxValue
+        self.n, self.m, self.c = np.shape(self.img_import)
 
-# a = img_import
-# a = np.array(a)
-# print(a)
-# print(np.shape(a))
+    def single_channel_contrast_generator(self, channel: int, curve_div=5):
+        self.img_import = np.moveaxis(self.img_import, source=2, destination=0)
+        for i in range(self.n):
+            for j in range(self.m):
+                self.img_import[channel, i, j] = math.sigmoid(
+                    x=((self.img_import[channel, i, j] / MAX_VALUE)*2 - 1), a=curve_div) * MAX_VALUE
+        self.img_import = np.moveaxis(self.img_import, source=0, destination=2)
+        print(np.shape(self.img_import))
 
-# b = np.moveaxis(a, source=2, destination=0)
-# print(b)
-# print(np.shape(b))
+    def single_channel_contrast_generator(self, channel: int, curve_div=5):
+        self.img_import = np.moveaxis(self.img_import, source=2, destination=0)
+        for i in range(self.n):
+            for j in range(self.m):
+                self.img_import[channel, i, j] = math.sigmoid(
+                    x=((self.img_import[channel, i, j] / MAX_VALUE)*2 - 1), a=curve_div) * MAX_VALUE
+        self.img_import = np.moveaxis(self.img_import, source=0, destination=2)
+        print(np.shape(self.img_import))
 
-n, m, c = np.shape(img_import)
-img_import = np.moveaxis(img_import, source=2, destination=0)
-for i in range(n):
-    for j in range(m):
-        img_import[2, i, j] = math.sigmoid(
-            x=((img_import[2, i, j] / MAX_VALUE)*2 - 1), a=5) * MAX_VALUE
-img_import = np.moveaxis(img_import, source=0, destination=2)
-print(np.shape(img_import))
 
+a = PreProcess(FILE_PATH, MAX_VALUE)
+a.single_channel_contrast_generator(1)
 while (True):
-    cv.imshow("img_import", img_import)
+    cv.imshow("img_import", a.img_import)
     if cv.waitKey(10) == ord('q'):
         break
 

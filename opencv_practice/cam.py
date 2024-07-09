@@ -7,7 +7,7 @@ from datetime import datetime
 
 
 '''
-a = cv.VideoCapture(0)
+a = cv.VideoCapture(1)
 if not a.isOpened():
     print("Cannot open camera")
     exit()
