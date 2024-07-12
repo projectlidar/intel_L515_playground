@@ -28,5 +28,5 @@ class MathTool():
     def ceil(self, x):
         return np.ceil(x)
 
-    def floor(self, x):
+    def floor(x):
         return np.floor(x)
