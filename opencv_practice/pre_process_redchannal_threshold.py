@@ -8,11 +8,11 @@ FILE_PATH = "opencv_practice\captured\Snipaste_2024-07-05_14-24-43.png"
 MAX_VALUE = 255
 
 '''the global variable for make red dot's contour '''
-# # 빨강영역이 HSV에서 ㅈ같이 분할되는 문제를 해결하기 위해 범위를 둘로 나눴다.
-# MIN_RED_THRESHOLD_1 = np.array([0, 85, 80])  # [H,S,V]
-# MAX_RED_THRESHOLD_1 = np.array([10, 255, 255])  # [H,S,V]
-# MIN_RED_THRESHOLD_2 = np.array([165, 85, 80])  # [H,S,V]
-# MAX_RED_THRESHOLD_2 = np.array([180, 255, 255])  # [H,S,V]
+# # ? 빨강영역이 HSV에서 ㅈ같이 분할되는 문제를 해결하기 위해 범위를 둘로 나눴다.
+# MIN_RED_THRESHOLD_1 = np.array([0, 85, 80])  # [H,S,V], 구간 1(a,b)의 a 즉, [MAX1]
+# MAX_RED_THRESHOLD_1 = np.array([10, 255, 255])  # [H,S,V] 구간 1(a,b)의 b 즉, [MIN1]
+# MIN_RED_THRESHOLD_2 = np.array([165, 85, 80])  # [H,S,V] 구간 2(a,b)의 a 즉, [MAX2]
+# MAX_RED_THRESHOLD_2 = np.array([180, 255, 255])  # [H,S,V] 구간 2(a,b)의 b 즉, [MIN2]
 MASK_THRESHOLD = np.array([[[0, 85, 80], [10, 255, 255]],
                           [[165, 85, 80], [180, 255, 255]]])  # [[[MAX1],[MIN1]],[[MAX2],[MIN2]]]
 # 문제가 진자 ㅈㄴ 많다. 피사체 표면 색 조금만 달라도 안되고 (특히 흰표면) 거리 멀어도 못잡음 시발.
@@ -56,14 +56,14 @@ class PreProcess():
         '''
         current_timestamp = time.time()
         self.img_import = np.moveaxis(self.img_import, source=2, destination=0)
-        # for k in list(channel):
-        #     '''under construction'''
-        #     # self.img_import = map(math.sigmoid, self.img_import[k])
-        #     ''''''
-        #     for i in range(self.n):
-        #         for j in range(self.m):
-        #             self.img_import[k, i, j] = math.sigmoid(
-        #                 x=((self.img_import[k, i, j] / MAX_VALUE)*2 - 1), a=curve_div) * MAX_VALUE
+        # // for k in list(channel):
+        # //     '''under construction'''
+        # //     # self.img_import = map(math.sigmoid, self.img_import[k])
+        # //     ''''''
+        # //     for i in range(self.n):
+        # //         for j in range(self.m):
+        # //             self.img_import[k, i, j] = math.sigmoid(
+        # //                 x=((self.img_import[k, i, j] / MAX_VALUE)*2 - 1), a=curve_div) * MAX_VALUE
         for k in channel:
             # 벡터화된 연산을 사용하여 시그모이드 적용
             self.img_import[k] = math.sigmoid(
@@ -93,16 +93,26 @@ class PreProcess():
             mask, cv.RETR_EXTERNAL, cv.CHAIN_APPROX_SIMPLE)
         return contour
 
+    def contour_shower(self, contour):
+        temp_map = self.img_import
+        x, y, c = np.shape(temp_map)
+        temp_map = temp_map*0
+        # for _ in contour:
+        #     for i, j in list(_):
+        #         temp_map[i, j] = [255, 255, 255]
+        return temp_map
+
 
 a = PreProcess(FILE_PATH, MAX_VALUE)
+print(np.shape(a.contour_maker(a.mask_kluster())))
 print(a.contour_maker(a.mask_kluster()))
 # a.single_channel_contrast_generator(1)
 # a.multi_channel_contrast_generator(channel=[2])
 
-# while (True):
-#     cv.imshow("img_import", a.mask_kluster())
-#     if cv.waitKey(10) == ord('q'):
-#         break
+while (True):
+    cv.imshow("img_import", a.contour_shower(a.mask_kluster()))
+    if cv.waitKey(10) == ord('q'):
+        break
 
 # cv.destroyAllWindows()
 
