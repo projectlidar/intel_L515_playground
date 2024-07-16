@@ -3,6 +3,10 @@ import time
 from function_tool import MathTool as math
 import cv2 as cv
 
+# TODO 거리-위치 그라디언트 맵 생성 함수
+# TODO 그라디언트 맵 필터 함수
+# TODO 더 충실한 객채지향
+
 FILE_PATH = "opencv_practice\captured\Snipaste_2024-07-05_14-24-43.png"
 # FILE_PATH = "opencv_practice\captured\maximun_distance_2024071218210875_2.jpg"
 MAX_VALUE = 255
@@ -123,7 +127,7 @@ class PreProcess():
     def dot_pos_maker(self, filtered_contour):
         significant_figure = 1000
         for i, dot in enumerate(filtered_contour):
-            M = cv.moments(dot)
+            M = cv.moments(dot)  # ! 구조 이해 안했음!
             if M["m00"] != 0:
                 cX = (int((M["m10"] / M["m00"])*significant_figure)
                       )/significant_figure
@@ -155,6 +159,7 @@ filtered_contour = a.contour_filter(a.contour_maker(mask))
 t_ini = a.time_keeper(t_ini=t_ini, print_text="make contour")
 # print(filtered_contour)
 dot = a.dot_shower(filtered_contour)
+t_ini = a.time_keeper(t_ini=t_ini, print_text="get dot")
 print(dot)
 dot_pos = a.dot_pos_maker(filtered_contour)
 t_ini = a.time_keeper(t_ini=t_ini, print_text="get dot pos")
