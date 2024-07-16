@@ -16,8 +16,8 @@ MAX_VALUE = 255
 MASK_THRESHOLD = np.array([[[0, 85, 80], [10, 255, 255]],
                           [[165, 85, 80], [180, 255, 255]]])  # [[[MAX1],[MIN1]],[[MAX2],[MIN2]]]
 # 문제가 진자 ㅈㄴ 많다. 피사체 표면 색 조금만 달라도 안되고 (특히 흰표면) 거리 멀어도 못잡음 시발.
-MIN_AREA = 4  # 최소 dot 크기, 약 160cm 거리에서 최소 5px
-MAX_AREA = 30  # 최대 dot 크기, 약 15cm 거리에서 최대 23px (약간의 shear 있음)
+MIN_AREA = 3**2  # 최소 dot 크기, 약 160cm 거리에서 최소 5px [r^2]
+MAX_AREA = 16**2  # 최대 dot 크기, 약 15cm 거리에서 최대 23px (약간의 shear 있음) [r^2]
 ''''''
 
 
@@ -36,6 +36,8 @@ class PreProcess():
             pass
         self._MAX_VALUE = maxValue
         self.n, self.m, self.c = np.shape(self.img_import)
+        self.t_tot = 0
+        self.time_sig_fig = 1000
 
     def single_channel_contrast_generator(self, channel: int, curve_div=5):
         self.img_import = np.moveaxis(self.img_import, source=2, destination=0)
@@ -90,7 +92,7 @@ class PreProcess():
 
     def contour_maker(self, mask):
         contour, _ = cv.findContours(
-            mask, cv.RETR_EXTERNAL, cv.CHAIN_APPROX_SIMPLE)
+            mask, cv.RETR_EXTERNAL, cv.CHAIN_APPROX_SIMPLE)  # ! 왜 쓰는지 모름
         return contour
 
     def contour_shower(self, contour):
@@ -102,17 +104,75 @@ class PreProcess():
         #         temp_map[i, j] = [255, 255, 255]
         return temp_map
 
+    def contour_filter(self, contour, min_area=MIN_AREA, max_area=MAX_AREA):
+        # Filter contours based on area to remove noise
+        filtered_contour = [cnt for cnt in contour if (
+            (cv.contourArea(cnt) > min_area) and (cv.contourArea(cnt) < max_area))]
+        return filtered_contour
 
+    def dot_shower(self, filtered_contour):
+        dot_pos = []
+        for dot in filtered_contour:
+            (x, y), radius = cv.minEnclosingCircle(dot)
+            dot_pos.append([(x, y), radius])
+            center = (int(x), int(y))
+            radius = int(radius)
+            cv.circle(self.img_import, center, radius, (0, 255, 0), 2)
+        return (dot_pos)
+
+    def dot_pos_maker(self, filtered_contour):
+        significant_figure = 1000
+        for i, dot in enumerate(filtered_contour):
+            M = cv.moments(dot)
+            if M["m00"] != 0:
+                cX = (int((M["m10"] / M["m00"])*significant_figure)
+                      )/significant_figure
+                cY = (int((M["m01"] / M["m00"])*significant_figure)
+                      )/significant_figure
+                print(f"Red dot {i+1} coordinates: ({cX}, {cY})")
+
+    def time_keeper(self, t_ini, print_text):
+        t_fin = time.time()
+        elipsed_time = (int((t_fin - t_ini) * 1000 *
+                        self.time_sig_fig))/self.time_sig_fig
+        self.t_tot += elipsed_time
+        print(f"{print_text}, elipsed time : {elipsed_time} ms")
+        t_ini = time.time()
+        return t_fin
+
+
+t_ini = time.time()
 a = PreProcess(FILE_PATH, MAX_VALUE)
-print(np.shape(a.contour_maker(a.mask_kluster())))
-print(a.contour_maker(a.mask_kluster()))
+t_ini = a.time_keeper(t_ini=t_ini, print_text="load")
+
+''''''
+# print(np.shape(a.contour_maker(a.mask_kluster())))
+# print(a.contour_maker(a.mask_kluster()))
+''''''
+mask = a.mask_kluster()
+t_ini = a.time_keeper(t_ini=t_ini, print_text="make mask")
+filtered_contour = a.contour_filter(a.contour_maker(mask))
+t_ini = a.time_keeper(t_ini=t_ini, print_text="make contour")
+# print(filtered_contour)
+dot = a.dot_shower(filtered_contour)
+print(dot)
+dot_pos = a.dot_pos_maker(filtered_contour)
+t_ini = a.time_keeper(t_ini=t_ini, print_text="get dot pos")
+print(dot_pos)
+
+
 # a.single_channel_contrast_generator(1)
 # a.multi_channel_contrast_generator(channel=[2])
 
 while (True):
-    cv.imshow("img_import", a.contour_shower(a.mask_kluster()))
+    cv.imshow("img_import", a.img_import)
+    cv.imshow("mask", mask)
+    # t_ini = a.time_keeper(t_ini=t_ini, print_text="drow screen")
     if cv.waitKey(10) == ord('q'):
         break
+
+print(f"total elipsed time : {a.t_tot} ms")
+print(f"total FPS : {1000/a.t_tot} fps")
 
 # cv.destroyAllWindows()
 
