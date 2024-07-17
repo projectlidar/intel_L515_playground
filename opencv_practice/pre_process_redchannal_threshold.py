@@ -24,6 +24,11 @@ MIN_AREA = 3**2  # 최소 dot 크기, 약 160cm 거리에서 최소 5px [r^2]
 MAX_AREA = 16**2  # 최대 dot 크기, 약 15cm 거리에서 최대 23px (약간의 shear 있음) [r^2]
 ''''''
 
+'''The global veriable for making distance-displacement gradient map'''
+
+
+''''''
+
 
 class PreProcess():
     def __init__(self, filePath, maxValue) -> None:
