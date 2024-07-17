@@ -12,7 +12,7 @@
 import numpy as np
 
 
-class MathTool():
+class MathTool(np):
     def __init__(self) -> None:
         pass
 
@@ -30,3 +30,23 @@ class MathTool():
 
     def floor(x):
         return np.floor(x)
+
+    def distance_calc(d_rel: float, h_rel: float, d_f: float, theta_laser: float, theta_2: float, n: float) -> tuple:
+        '''calculate object distance use "eq.of straight line" when know the angle of lens to sensor.
+            Args:
+                - d_rel[m] : relative distance (x-axis) between center of sensor to center of laser.[m]
+                - h_rel[m] : relative distance (y-axis) between center of sensor to center of laser.[m]
+                - d_f[m] : distance with center of lens to center of sensor.
+                - theta_laser[rad] : relative angle of lasor about vertical normal line. [rad]
+                - theta_2[rad] : relative angle of refracted light about lens's optical axis. [rad]
+                    when n=1, you can input incident light's angle instead of refracted one.
+                - n : relative refraction rate of lens about atmosphere(STP, for 653nm).
+
+        '''
+        if (n == 1):
+            theta_1 = theta_2
+        else:
+            theta_1 = np.arcsin(n * np.sin(theta_2))
+        x = ((-1 * d_f) + (d_rel*np.cot)) / (() + ())
+
+        return (x, y)
