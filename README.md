@@ -56,6 +56,8 @@ just for fun
   - 현재 세팅은, 마스크 영역과, 찾은 dot 영역의 활성화를 보여줄 겁니다.
   - 실행을 하시고, 터미널을 보시면, 각 함수별 실행 시간과, 찾은 dot의 위치, dot 영역의 크기(반지름)을 현시해줍니다.
 
+---
+
 ### you can download Intel RealSence SDK 2.0 below the link
 
 https://github.com/IntelRealSense/librealsense/releases/tag/v2.54.2
