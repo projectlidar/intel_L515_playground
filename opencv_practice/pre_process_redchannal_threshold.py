@@ -7,8 +7,12 @@ import cv2 as cv
 # TODO 그라디언트 맵 필터 함수
 # TODO 더 충실한 객채지향
 
-FILE_PATH = "opencv_practice\captured\Snipaste_2024-07-05_14-24-43.png"
+# FILE_PATH = "opencv_practice\captured\Snipaste_2024-07-05_14-24-43.png" #default
 # FILE_PATH = "opencv_practice\captured\maximun_distance_2024071218210875_2.jpg"
+# FILE_PATH = "opencv_practice\captured\captured_2024081610185380_3.jpg"
+FILE_PATH = "opencv_practice\captured\captured_2024082000201028_5.jpg"
+
+
 MAX_VALUE = 255
 
 '''the global variable for make red dot's contour '''
@@ -17,11 +21,11 @@ MAX_VALUE = 255
 # MAX_RED_THRESHOLD_1 = np.array([10, 255, 255])  # [H,S,V] 구간 1(a,b)의 b 즉, [MIN1]
 # MIN_RED_THRESHOLD_2 = np.array([165, 85, 80])  # [H,S,V] 구간 2(a,b)의 a 즉, [MAX2]
 # MAX_RED_THRESHOLD_2 = np.array([180, 255, 255])  # [H,S,V] 구간 2(a,b)의 b 즉, [MIN2]
-MASK_THRESHOLD = np.array([[[0, 85, 80], [10, 255, 255]],
-                          [[165, 85, 80], [180, 255, 255]]])  # [[[MAX1],[MIN1]],[[MAX2],[MIN2]]]
-# 문제가 진자 ㅈㄴ 많다. 피사체 표면 색 조금만 달라도 안되고 (특히 흰표면) 거리 멀어도 못잡음 시발.
-MIN_AREA = 3**2  # 최소 dot 크기, 약 160cm 거리에서 최소 5px [r^2]
-MAX_AREA = 16**2  # 최대 dot 크기, 약 15cm 거리에서 최대 23px (약간의 shear 있음) [r^2]
+MASK_THRESHOLD = np.array([[[0, 16,  16], [10, 255, 255]],
+                          [[165,  16,  16], [180, 255, 255]]])  # [[[MAX1],[MIN1]],[[MAX2],[MIN2]]]
+# 문제가 진자 ㅈㄴ 많다. 피사체 표면 색 조금만 달라도 안되고 (특히 흰표면) 거리 멀어도 못잡음
+MIN_AREA = 0.5**2  # 최소 dot 크기, 약 160cm 거리에서 최소 5px [r^2]
+MAX_AREA = 14**2  # 최대 dot 크기, 약 15cm 거리에서 최대 23px (약간의 shear 있음) [r^2]
 ''''''
 
 '''The global veriable for making distance-displacement gradient map'''
