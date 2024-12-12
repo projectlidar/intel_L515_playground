@@ -61,42 +61,44 @@ class PreProcess():
 
  def mask_kluster(self):
       n, m, o = np.shape(MASK_THRESHOLD)
-       _mask = self.mask_maker(np.array([0, 0, 0]), np.array([0, 0, 0]), 0, 0)
-        _mask -= _mask
+       _mask = self.mask_maker(np.array([0, 0, 0]), np.array(
+           [0, 0, 0]), 0, 0)  # 생성한 1차 필터 호출
+        _mask -= _mask  # 1차 필터 병합
         for i in range(n):
             _mask += self.mask_maker(MASK_THRESHOLD[i, 0],
-                                     MASK_THRESHOLD[i, 1], MIN_AREA, MAX_AREA)
+                                     MASK_THRESHOLD[i, 1], MIN_AREA, MAX_AREA)  # 1차 필터 적용
         return _mask
 ''''''
 
-'''이미지로부터 신호를 구분하기 위한 2차 필터 생성함수'''
+'''이미지로부터 신호를 구분하기 위한 2차 필터 생성 및 적용 함수'''
 
  def contour_maker(self, mask):
       contour, _ = cv.findContours(
-           mask, cv.RETR_EXTERNAL, cv.CHAIN_APPROX_SIMPLE)
+           mask, cv.RETR_EXTERNAL, cv.CHAIN_APPROX_SIMPLE)  # 1차 필터를 지난 데이터에 2차 필터 적용
        return contour
 ''''''
 
-'''이미지로부터 신호를 구분하기 위한 2차 필터 적용 및 후처리 함수'''
+'''이미지로부터 신호를 구분하기 위한 2차 필터 후처리 함수'''
 
  def contour_filter(self, contour, min_area=MIN_AREA, max_area=MAX_AREA):
       filtered_contour = [cnt for cnt in contour if (
-           (cv.contourArea(cnt) > min_area) and (cv.contourArea(cnt) < max_area))]
+           (cv.contourArea(cnt) > min_area) and (cv.contourArea(cnt) < max_area))]  # 2차 필터 후처리 후 제적용
        return filtered_contour
 ''''''
 
 '''신호의 위치와 크기를 각각 계산하는 함수'''
 
  def dot_shower(self, filtered_contour):
-      dot_pos = []
+      dot_pos = []  # 위치 및 크기 값을 저장할 리스트
        for i, dot in enumerate(filtered_contour):
-            (x, y), radius = cv.minEnclosingCircle(dot)
-            dot_pos.append([(x, y), radius])
-            center = (int(x), int(y))
-            radius = int(radius)
-            cv.circle(self.img_import, center, radius, (0, 255, 0), 2)
+            (x, y), radius = cv.minEnclosingCircle(dot)  # 각 점의 위치와 크기를 생성
+            dot_pos.append([(x, y), radius])  # 생성된 데이터 저장
+            center = (int(x), int(y))  # 위치 값 저장
+            radius = int(radius)  # 크기 값 저장
+            cv.circle(self.img_import, center, radius,
+                      (0, 255, 0), 2)  # 이미지에 신호 위치 표시
             cv.putText(self.img_import, str(i + 1), center,
-                       cv.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
+                       cv.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)  # 이미지에 신호 위치 표기
         return dot_pos
 ''''''
 
